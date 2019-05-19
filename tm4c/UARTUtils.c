@@ -49,12 +49,11 @@
 
 /* Example/Board Header files */
 #include "Board.h"
-#include "UARTUtils.h"
-
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <UARTUtils.h>
 
 #define NUM_PORTS 1
 

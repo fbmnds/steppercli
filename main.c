@@ -52,11 +52,11 @@
 /* TI-RTOS Header files */
 #include <ti/drivers/GPIO.h>
 #include <ti/drivers/UART.h>
+#include <UARTUtils.h>
+#include <USBCDCD_LoggerIdle.h>
 
 /* Example/Board Header files */
 #include "Board.h"
-#include "UARTUtils.h"
-#include "USBCDCD_LoggerIdle.h"
 
 #define TASKSTACKSIZE     1536
 

@@ -60,7 +60,7 @@
 #include <usblib/device/usbdcdc.h>
 
 /* Example/Board Header files */
-#include "USBCDCD_LoggerIdle.h"
+#include <USBCDCD_LoggerIdle.h>
 
 #if defined(TIVAWARE)
 typedef uint32_t            USBCDCD_LoggerIdleEventType;
