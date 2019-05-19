@@ -38,6 +38,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <inttypes.h>
 
 /* XDCtools Header files */
 #include <xdc/std.h>
@@ -54,6 +56,7 @@
 #include <ti/drivers/UART.h>
 #include <UARTUtils.h>
 #include <USBCDCD_LoggerIdle.h>
+#include "lib/calc.h"
 
 /* Example/Board Header files */
 #include "Board.h"
@@ -70,6 +73,7 @@ Char task0Stack[TASKSTACKSIZE];
 Void consoleFxn(UArg arg0, UArg arg1)
 {
     unsigned int sleepDur;
+    float distance;
     unsigned int count;
     unsigned int cpuLoad;
     char input[128];
@@ -96,6 +100,19 @@ Void consoleFxn(UArg arg0, UArg arg1)
             cpuLoad = Load_getCPULoad();
             printf("CPU Load: %d\n", cpuLoad);
         }
+        else if (!strcmp(input, "calc")) {
+            /* Calculate steps per distance */
+            printf("Enter a distance (mm): ");
+            fflush(stdout);
+            scanf("%f", &distance);
+            fflush(stdin);
+            printf("Microsteps per distance: %" PRIu32 "\n", STEPS_PER_DISTANCE(distance));
+            fflush(stdout);
+        }
+        else if (!strcmp(input, "max_uint32")) {
+            printf("Maximum value of uint32_t: %" PRIu32 "\n", UINT32_MAX);
+            fflush(stdout);
+        }
         else if (!strcmp(input, "sleep")) {
             /* Put the task to sleep for X ms. */
             printf("Enter a duration (ms): ");
@@ -119,6 +136,8 @@ Void consoleFxn(UArg arg0, UArg arg1)
             /* Print a list of valid commands. */
             printf("Valid commands:\n"
                    "- load: Get the CPU and task load.\n"
+                   "- max_uint32: Maximum value of uint32_t.\n"
+                   "- calc: Calculate microsteps per distance [mm].\n"
                    "- sleep: Put the console task to sleep.\n"
                    "- exit: Exit the console task.\n");
         }
