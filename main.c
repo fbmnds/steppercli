@@ -56,10 +56,14 @@
 #include <ti/drivers/UART.h>
 #include <UARTUtils.h>
 #include <USBCDCD_LoggerIdle.h>
-#include "lib/calc.h"
 
 /* Example/Board Header files */
 #include "Board.h"
+
+/* Application Header files */
+#include "lib/settings.h"
+#include "lib/pwm.h"
+
 
 #define TASKSTACKSIZE     1536
 
@@ -74,6 +78,7 @@ Void consoleFxn(UArg arg0, UArg arg1)
 {
     unsigned int sleepDur;
     float distance;
+    uint32_t adjust;
     unsigned int count;
     unsigned int cpuLoad;
     char input[128];
@@ -106,12 +111,24 @@ Void consoleFxn(UArg arg0, UArg arg1)
             fflush(stdout);
             scanf("%f", &distance);
             fflush(stdin);
-            printf("Microsteps per distance: %" PRIu32 "\n", STEPS_PER_DISTANCE(distance));
+            printf("Microsteps per distance: %" PRIu32 "\n", MICROSTEPS_PER_DISTANCE(distance));
             fflush(stdout);
         }
-        else if (!strcmp(input, "max_uint32")) {
-            printf("Maximum value of uint32_t: %" PRIu32 "\n", UINT32_MAX);
+        else if (!strcmp(input, "pwm_print")) {
+            /* Print PWM parameter*/
+            pwm_print();
+        }
+        else if (!strcmp(input, "pwm_stop")) {
+            /* Stop PWM */
+            pwm_stop();
+        }
+        else if (!strcmp(input, "pwm_duty")) {
+            /* Adjust the PWM duty. */
+            printf("Enter duty (us): ");
             fflush(stdout);
+            scanf("%" PRIu32, &adjust);
+            fflush(stdin);
+            pwm_setDuty(adjust);
         }
         else if (!strcmp(input, "sleep")) {
             /* Put the task to sleep for X ms. */
@@ -136,8 +153,11 @@ Void consoleFxn(UArg arg0, UArg arg1)
             /* Print a list of valid commands. */
             printf("Valid commands:\n"
                    "- load: Get the CPU and task load.\n"
-                   "- max_uint32: Maximum value of uint32_t.\n"
                    "- calc: Calculate microsteps per distance [mm].\n"
+                   "- pwm_start: Start PWM.\n"
+                   "- pwm_stop: Stop PWM.\n"
+                   "- pwm_adjust: Adjust PWM load.\n"
+                   "- pwm_print: Print PWM parameters.\n"
                    "- sleep: Put the console task to sleep.\n"
                    "- exit: Exit the console task.\n");
         }
@@ -157,6 +177,8 @@ int main(void)
     Board_initGPIO();
     Board_initUART();
     Board_initUSB(Board_USBDEVICE);
+    Board_initPWM();
+    pwm_init();
 
     /* Construct BIOS objects */
     Task_Params taskParams;
@@ -165,6 +187,10 @@ int main(void)
     taskParams.stackSize = TASKSTACKSIZE;
     taskParams.stack = &task0Stack;
     Task_construct(&task0Struct, (Task_FuncPtr)consoleFxn, &taskParams, NULL);
+
+
+    /* Initialize PWM */
+    //pwm_init();
 
     /* Turn on user LED */
     GPIO_write(Board_LED0, Board_LED_ON);
