@@ -8,6 +8,7 @@
 /* BIOS Header files */
 #include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/knl/Task.h>
+#include <ti/sysbios/knl/Event.h>
 
 /* TI-RTOS Header files */
 #include <ti/drivers/GPIO.h>
@@ -18,25 +19,12 @@
 
 #include <stdio.h>
 
-/* BIOS Header files */
-#include <ti/sysbios/knl/Event.h>
-
-/*
-#include <stdio.h>
-#include <string.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <inttypes.h>
-*/
 
 extern Event_Handle evtPWM;
 
 Void pwmFxn(UArg arg0, UArg arg1);
 
-void pwm_start(void);
-void pwm_stop(void);
-//void pwm_setPeriod(uint16_t period);
-void pwm_setDuty(uint16_t duty);
-void pwm_print(void);
+#define EVT_PWMPRINT   Event_Id_00
+#define EVT_PWMSETDUTY Event_Id_01
 
 #endif /* LIB_PWM_H_ */

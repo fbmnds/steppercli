@@ -12,7 +12,7 @@
 #include "lib/pwm.h"
 
 extern Event_Handle evtPWM;
-
+extern uint16_t pwmDuty;
 
 Void consoleFxn(UArg arg0, UArg arg1);
 

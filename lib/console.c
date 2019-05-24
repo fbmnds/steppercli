@@ -15,7 +15,7 @@ void print_greeting(void)
     printf("Enter a command followed by return.\n"
            "Type help for a list of commands.\n\n");
 
-//    printf("%d %% ", count++);
+    printf("%d %% ", count++);
     fflush(stdout);
 }
 
@@ -71,9 +71,9 @@ void do_pwm_duty (void)
     /* Adjust the PWM duty. */
     printf("Enter duty (us): ");
     fflush(stdout);
-    scanf("%" PRIu32, &adjust);
+    scanf("%" PRIu16, &pwmDuty);
     fflush(stdin);
-    pwm_setDuty(adjust);
+    Event_post(evtPWM, EVT_PWMSETDUTY);
 }
 
 /*
@@ -102,7 +102,7 @@ Void consoleFxn(UArg arg0, UArg arg1)
         }
         else if (!strcmp(input, "pwm_print")) {
             /* Print PWM parameter*/
-            Event_post(evtPWM, Event_Id_00);
+            Event_post(evtPWM, EVT_PWMPRINT);
         }
         else if (!strcmp(input, "pwm_stop")) {
             /* Stop PWM */

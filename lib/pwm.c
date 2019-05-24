@@ -39,7 +39,15 @@
 
 
 
+uint16_t   pwmDuty = 0;
 
+void pwm_print(PWM_Handle pwm1)
+{
+    unsigned int t = PWM_getPeriodMicroSecs(pwm1);
+    printf("PWM period (us): %d\n", t);
+    printf("PWM duty: %u\n", pwmDuty);
+    fflush(stdout);
+}
 
 
 Void pwmFxn(UArg arg0, UArg arg1)
@@ -50,8 +58,9 @@ Void pwmFxn(UArg arg0, UArg arg1)
     uint16_t   pwmPeriod = 3000;      // Period and duty in microseconds
     //uint16_t   duty = 0;
     //uint16_t   dutyInc = 100;
-    uint16_t   pwmDuty = 0;
+
     //uint16_t   dutyInc = 100;
+    UInt events;
 
 
     PWM_Params_init(&params);
@@ -71,12 +80,12 @@ Void pwmFxn(UArg arg0, UArg arg1)
 
     /* Loop forever incrementing the PWM duty */
     while (1) {
-        //mask = ;// + event1; //"evtPWMPrint" + "evtPWMSetDuty";
-        if (Event_pend(evtPWM, Event_Id_00, Event_Id_NONE, BIOS_WAIT_FOREVER)) {
-            unsigned int t = PWM_getPeriodMicroSecs(pwm1);
-            printf("PWM period (us): %d\n", t);
-            printf("PWM duty: %u\n", pwmDuty);
-            fflush(stdout);
+        int mask = EVT_PWMPRINT + EVT_PWMSETDUTY;
+        events = Event_pend(evtPWM, mask, Event_Id_NONE, BIOS_WAIT_FOREVER);
+        if (events & EVT_PWMPRINT) {
+            pwm_print(pwm1);
+        } else if (events & EVT_PWMSETDUTY) {
+            PWM_setDuty(pwm1, 1200);
         }
     }
 }
@@ -98,12 +107,4 @@ void pwm_setDuty(uint16_t duty)
     //PWM_setDuty(pwm1, duty);
 }
 
-void pwm_print(void)
-{
-    /*
-    unsigned int t = PWM_getPeriodMicroSecs(pwm1);
-    printf("PWM period (us): %d\n", t);
-    printf("PWM duty: %u\n", pwmDuty);
-    fflush(stdout);
-    */
-}
+
