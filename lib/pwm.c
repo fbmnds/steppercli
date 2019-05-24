@@ -34,26 +34,33 @@
  *  ======== pwm.c ========
  */
 
+
 #include "pwm.h"
 
-PWM_Handle pwm1;
-//PWM_Handle pwm2 = NULL;
-const uint16_t pwmPeriod = 3000;      // Period and duty in microseconds
-PWM_Params params;
-uint16_t   pwmDuty = 0;
-//uint16_t   dutyInc = 100;
 
 
-void pwm_init(void)
+
+
+
+Void pwmFxn(UArg arg0, UArg arg1)
 {
-    params.period = pwmPeriod;
+    PWM_Handle pwm1;
+    PWM_Handle pwm2 = NULL;
+    PWM_Params params;
+    uint16_t   pwmPeriod = 3000;      // Period and duty in microseconds
+    //uint16_t   duty = 0;
+    //uint16_t   dutyInc = 100;
+    uint16_t   pwmDuty = 0;
+    //uint16_t   dutyInc = 100;
+
+
     PWM_Params_init(&params);
-    pwm1 = PWM_open(Board_PWM1, &params);
+    params.period = pwmPeriod;
+    pwm1 = PWM_open(Board_PWM0, &params);
     if (pwm1 == NULL) {
-        System_abort("Board_PWM1 did not open");
+        System_abort("Board_PWM0 did not open");
     }
 
-/*
     if (Board_PWM1 != Board_PWM0) {
         params.polarity = PWM_POL_ACTIVE_LOW;
         pwm2 = PWM_open(Board_PWM1, &params);
@@ -61,30 +68,42 @@ void pwm_init(void)
             System_abort("Board_PWM1 did not open");
         }
     }
-*/
 
+    /* Loop forever incrementing the PWM duty */
+    while (1) {
+        //mask = ;// + event1; //"evtPWMPrint" + "evtPWMSetDuty";
+        if (Event_pend(evtPWM, Event_Id_00, Event_Id_NONE, BIOS_WAIT_FOREVER)) {
+            unsigned int t = PWM_getPeriodMicroSecs(pwm1);
+            printf("PWM period (us): %d\n", t);
+            printf("PWM duty: %u\n", pwmDuty);
+            fflush(stdout);
+        }
+    }
 }
+
 
 void pwm_start(void)
 {
-    PWM_setDuty(pwm1, (pwmPeriod >> 1));
+    //PWM_setDuty(pwm1, (pwmPeriod >> 1));
 }
 
 void pwm_stop(void)
 {
-    PWM_setDuty(pwm1, 0);
+    //PWM_setDuty(pwm1, 0);
 }
 
 void pwm_setDuty(uint16_t duty)
 {
-    pwmDuty = duty;
-    PWM_setDuty(pwm1, duty);
+    //pwmDuty = duty;
+    //PWM_setDuty(pwm1, duty);
 }
 
 void pwm_print(void)
 {
+    /*
     unsigned int t = PWM_getPeriodMicroSecs(pwm1);
     printf("PWM period (us): %d\n", t);
     printf("PWM duty: %u\n", pwmDuty);
     fflush(stdout);
+    */
 }

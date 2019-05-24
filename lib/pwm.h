@@ -18,6 +18,9 @@
 
 #include <stdio.h>
 
+/* BIOS Header files */
+#include <ti/sysbios/knl/Event.h>
+
 /*
 #include <stdio.h>
 #include <string.h>
@@ -26,10 +29,10 @@
 #include <inttypes.h>
 */
 
+extern Event_Handle evtPWM;
 
+Void pwmFxn(UArg arg0, UArg arg1);
 
-
-void pwm_init(void);
 void pwm_start(void);
 void pwm_stop(void);
 //void pwm_setPeriod(uint16_t period);

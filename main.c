@@ -61,111 +61,21 @@
 #include "Board.h"
 
 /* Application Header files */
+#include "lib/console.h"
 #include "lib/settings.h"
 #include "lib/pwm.h"
 
 
-#define TASKSTACKSIZE     1536
+#define CONSOLESTACKSIZE     1536
 
-Task_Struct task0Struct;
-Char task0Stack[TASKSTACKSIZE];
+Task_Struct taskCStruct;
+Char taskCStack[CONSOLESTACKSIZE];
 
-/*
- *  ======== consoleFxn ========
- *  Task for this function is created statically. See the project's .cfg file.
- */
-Void consoleFxn(UArg arg0, UArg arg1)
-{
-    unsigned int sleepDur;
-    float distance;
-    uint32_t adjust;
-    unsigned int count;
-    unsigned int cpuLoad;
-    char input[128];
+#define PWMSTACKSIZE     1536
 
-    count = 1;
+Task_Struct taskPWMStruct;
+Char taskPWMStack[PWMSTACKSIZE];
 
-    /* printf goes to the UART com port */
-    printf("\f======== Welcome to the Console ========\n");
-    printf("Enter a command followed by return.\n"
-           "Type help for a list of commands.\n\n");
-
-    printf("%d %% ", count++);
-    fflush(stdout);
-
-    /* Loop forever receiving commands */
-    while(true) {
-        /* Get the user's input */
-        scanf("%s", input);
-        /* Flush the remaining characters from stdin since they are not used. */
-        fflush(stdin);
-
-        if (!strcmp(input, "load")) {
-            /* Print the CPU load */
-            cpuLoad = Load_getCPULoad();
-            printf("CPU Load: %d\n", cpuLoad);
-        }
-        else if (!strcmp(input, "calc")) {
-            /* Calculate steps per distance */
-            printf("Enter a distance (mm): ");
-            fflush(stdout);
-            scanf("%f", &distance);
-            fflush(stdin);
-            printf("Microsteps per distance: %" PRIu32 "\n", MICROSTEPS_PER_DISTANCE(distance));
-            fflush(stdout);
-        }
-        else if (!strcmp(input, "pwm_print")) {
-            /* Print PWM parameter*/
-            pwm_print();
-        }
-        else if (!strcmp(input, "pwm_stop")) {
-            /* Stop PWM */
-            pwm_stop();
-        }
-        else if (!strcmp(input, "pwm_duty")) {
-            /* Adjust the PWM duty. */
-            printf("Enter duty (us): ");
-            fflush(stdout);
-            scanf("%" PRIu32, &adjust);
-            fflush(stdin);
-            pwm_setDuty(adjust);
-        }
-        else if (!strcmp(input, "sleep")) {
-            /* Put the task to sleep for X ms. */
-            printf("Enter a duration (ms): ");
-            fflush(stdout);
-            scanf("%d", &sleepDur);
-            fflush(stdin);
-            Task_sleep(sleepDur);
-        }
-        else if (!strcmp(input, "exit")) {
-            /* Exit the console task */
-            printf("Are you sure you want to exit the console? Y/N: ");
-            fflush(stdout);
-            scanf("%s", input);
-            fflush(stdin);
-            if ((input[0] == 'y' || input[0] == 'Y') && input[1] == 0x00) {
-                printf("Exiting console, goodbye.\n");
-                Task_exit();
-            }
-        }
-        else {
-            /* Print a list of valid commands. */
-            printf("Valid commands:\n"
-                   "- load: Get the CPU and task load.\n"
-                   "- calc: Calculate microsteps per distance [mm].\n"
-                   "- pwm_start: Start PWM.\n"
-                   "- pwm_stop: Stop PWM.\n"
-                   "- pwm_adjust: Adjust PWM load.\n"
-                   "- pwm_print: Print PWM parameters.\n"
-                   "- sleep: Put the console task to sleep.\n"
-                   "- exit: Exit the console task.\n");
-        }
-
-        printf("%d %% ", count++);
-        fflush(stdout);
-    }
-}
 
 /*
  *  ======== main ========
@@ -178,19 +88,21 @@ int main(void)
     Board_initUART();
     Board_initUSB(Board_USBDEVICE);
     Board_initPWM();
-    pwm_init();
 
     /* Construct BIOS objects */
-    Task_Params taskParams;
+    Task_Params taskCParams;
 
-    Task_Params_init(&taskParams);
-    taskParams.stackSize = TASKSTACKSIZE;
-    taskParams.stack = &task0Stack;
-    Task_construct(&task0Struct, (Task_FuncPtr)consoleFxn, &taskParams, NULL);
+    Task_Params_init(&taskCParams);
+    taskCParams.stackSize = CONSOLESTACKSIZE;
+    taskCParams.stack = &taskCStack;
+    Task_construct(&taskCStruct, (Task_FuncPtr)consoleFxn, &taskCParams, NULL);
 
+    Task_Params taskPWMParams;
 
-    /* Initialize PWM */
-    //pwm_init();
+    Task_Params_init(&taskPWMParams);
+    taskPWMParams.stackSize = PWMSTACKSIZE;
+    taskPWMParams.stack = &taskPWMStack;
+    Task_construct(&taskPWMStruct, (Task_FuncPtr)pwmFxn, &taskPWMParams, NULL);
 
     /* Turn on user LED */
     GPIO_write(Board_LED0, Board_LED_ON);
