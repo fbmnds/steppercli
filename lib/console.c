@@ -106,7 +106,7 @@ Void consoleFxn(UArg arg0, UArg arg1)
         }
         else if (!strcmp(input, "pwm_stop")) {
             /* Stop PWM */
-            pwm_stop();
+            ;
         }
         else if (!strcmp(input, "pwm_duty")) {
             do_pwm_duty();

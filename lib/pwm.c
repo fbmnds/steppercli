@@ -37,18 +37,9 @@
 
 #include "pwm.h"
 
+void pwm_print(PWM_Handle pwm1);
 
-
-uint16_t   pwmDuty = 0;
-
-void pwm_print(PWM_Handle pwm1)
-{
-    unsigned int t = PWM_getPeriodMicroSecs(pwm1);
-    printf("PWM period (us): %d\n", t);
-    printf("PWM duty: %u\n", pwmDuty);
-    fflush(stdout);
-}
-
+uint16_t pwmDuty = 0;
 
 Void pwmFxn(UArg arg0, UArg arg1)
 {
@@ -64,7 +55,7 @@ Void pwmFxn(UArg arg0, UArg arg1)
 
 
     PWM_Params_init(&params);
-    params.period = pwmPeriod;
+    params.period = pwmPeriod;  // ~ microstep_delay(current_feed_rate, sin x²-ramp)
     pwm1 = PWM_open(Board_PWM0, &params);
     if (pwm1 == NULL) {
         System_abort("Board_PWM0 did not open");
@@ -78,6 +69,17 @@ Void pwmFxn(UArg arg0, UArg arg1)
         }
     }
 
+    /*
+     * PWM_setDuty(pwm1, duty);  // fix ~ microstep
+     */
+
+    /*
+     * register isrPWMCtl: PWMGenIntRegister
+     * PWMGenIntTrigDisable
+     * init isrPWMCounter -> 0
+     */
+
+
     /* Loop forever incrementing the PWM duty */
     while (1) {
         int mask = EVT_PWMPRINT + EVT_PWMSETDUTY;
@@ -85,21 +87,41 @@ Void pwmFxn(UArg arg0, UArg arg1)
         if (events & EVT_PWMPRINT) {
             pwm_print(pwm1);
         } else if (events & EVT_PWMSETDUTY) {
-            PWM_setDuty(pwm1, 1200);
+            PWM_setDuty(pwm1, pwmDuty);
         }
     }
 }
 
-
-void pwm_start(void)
+void pwm_print(PWM_Handle pwm1)
 {
-    //PWM_setDuty(pwm1, (pwmPeriod >> 1));
+    unsigned int t = PWM_getPeriodMicroSecs(pwm1);
+    printf("PWM period (us): %d\n", t);
+    printf("PWM duty: %u\n", pwmDuty);
+    fflush(stdout);
 }
 
-void pwm_stop(void)
+void pwm_start(/*#microsteps*/)
 {
-    //PWM_setDuty(pwm1, 0);
+    /*
+     * PWMGenIntClear
+     * set isrPWMCounter -> #microsteps
+     * PWMGenIntTrigEnable
+     * PWMGenEnable
+     */
 }
+
+//void pwm_stop(void)
+//{
+
+    /*
+     * isrPWMCtl:
+     * TODO: add fault handler -> based on ADC input from encoder
+     *      PWMGenIntClear
+     *      lookup sin(x²)[isrPWMCounter] -> PWMGenPeriodSet
+     *      decrement isrPWMCounter
+     *      if isrPWMCounter == 0 -> PWMGenDisable; PWMGenIntTrigDisable
+     */
+//}
 
 void pwm_setDuty(uint16_t duty)
 {
