@@ -3,6 +3,7 @@ RemoteSystemsTempFiles/
 dvt/
 .launches/
 .xdchelp
+.~*
 # ignore generated files
 src/*
 
