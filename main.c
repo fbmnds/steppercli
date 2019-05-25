@@ -64,6 +64,7 @@
 #include "lib/console.h"
 #include "lib/settings.h"
 #include "lib/pwm.h"
+#include "lib/gptm.h"
 
 
 #define CONSOLESTACKSIZE     1536
@@ -104,8 +105,10 @@ int main(void)
     taskPWMParams.stack = &taskPWMStack;
     Task_construct(&taskPWMStruct, (Task_FuncPtr)pwmFxn, &taskPWMParams, NULL);
 
+    gptm_init();
+
     /* Turn on user LED */
-    GPIO_write(Board_LED0, Board_LED_ON);
+    GPIO_write(Board_LED2, Board_LED_ON);
 
     /*
      *  Add the UART device to the system.
