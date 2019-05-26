@@ -26,7 +26,7 @@ void print_valid_cmds(void)
     "- calc: Calculate microsteps per distance [mm].\n"
     "- pwm_start: Start PWM.\n"
     "- pwm_stop: Stop PWM.\n"
-    "- pwm_adjust: Adjust PWM load.\n"
+    "- pwm_duty: Adjust PWM load.\n"
     "- pwm_print: Print PWM parameters.\n"
     "- sleep: Put the console task to sleep.\n"
     "- exit: Exit the console task.\n");
@@ -69,11 +69,11 @@ void do_calc(void)
 void do_pwm_duty (void)
 {
     /* Adjust the PWM duty. */
-    //printf("Enter duty (us): ");
-    //fflush(stdout);
-    //scanf("%" PRIu16, &pwmDuty);
-    //fflush(stdin);
-    //Event_post(evtPWM, EVT_PWMSETDUTY);
+    printf("Enter duty (us): ");
+    fflush(stdout);
+    scanf("%" PRIu16, &pwmDuty);
+    fflush(stdin);
+    Event_post(evtPWM, EVT_PWMSETDUTY);
 }
 
 /*
@@ -102,14 +102,18 @@ Void consoleFxn(UArg arg0, UArg arg1)
         }
         else if (!strcmp(input, "pwm_print")) {
             /* Print PWM parameter*/
-            //Event_post(evtPWM, EVT_PWMPRINT);
+            Event_post(evtPWM, EVT_PWMPRINT);
+        }
+        else if (!strcmp(input, "pwm_start")) {
+            /* Stop PWM */
+            Event_post(evtPWM, EVT_PWMSTART);
         }
         else if (!strcmp(input, "pwm_stop")) {
             /* Stop PWM */
-            ;
+            Event_post(evtPWM, EVT_PWMSTOP);
         }
         else if (!strcmp(input, "pwm_duty")) {
-            //do_pwm_duty();
+            do_pwm_duty();
         }
         else if (!strcmp(input, "sleep")) {
             do_sleep();

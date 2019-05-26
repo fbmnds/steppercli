@@ -10,6 +10,7 @@
 #include "driverlib/interrupt.h"
 #include "driverlib/gpio.h"
 #include "driverlib/timer.h"
+
 #include <ti/sysbios/hal/Hwi.h>
 #include <xdc/runtime/Error.h>
 #include <ti/sysbios/BIOS.h>
@@ -19,9 +20,10 @@
 #include <ti/drivers/GPIO.h>
 
 
+
 void gptm_init(void);
 
-Void gptm_isr(UArg arg0);
+//Void gptm_isr(UArg arg0);
 
 
 #endif /* LIB_GPTM_H_ */

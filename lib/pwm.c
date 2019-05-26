@@ -37,96 +37,40 @@
 
 #include "pwm.h"
 
-void pwm_print(PWM_Handle pwm1);
 
-uint16_t pwmDuty = 0;
+
 
 Void pwmFxn(UArg arg0, UArg arg1)
 {
-    PWM_Handle pwm1;
-    PWM_Handle pwm2 = NULL;
-    PWM_Params params;
-    uint16_t   pwmPeriod = 3000;      // Period and duty in microseconds
-    //uint16_t   duty = 0;
-    //uint16_t   dutyInc = 100;
-
-    //uint16_t   dutyInc = 100;
     UInt events;
+    //uint16_t pwmPeriod;
+
+    gptm_init();
 
 
-    PWM_Params_init(&params);
-    params.period = pwmPeriod;  // ~ microstep_delay(current_feed_rate, sin x²-ramp)
-    pwm1 = PWM_open(Board_PWM0, &params);
-    if (pwm1 == NULL) {
-        System_abort("Board_PWM0 did not open");
-    }
-
-    if (Board_PWM1 != Board_PWM0) {
-        params.polarity = PWM_POL_ACTIVE_LOW;
-        pwm2 = PWM_open(Board_PWM1, &params);
-        if (pwm2 == NULL) {
-            System_abort("Board_PWM1 did not open");
-        }
-    }
-
-    /*
-     * PWM_setDuty(pwm1, duty);  // fix ~ microstep
-     */
-
-    /*
-     * register isrPWMCtl: PWMGenIntRegister
-     * PWMGenIntTrigDisable
-     * init isrPWMCounter -> 0
-     */
-
-
-    /* Loop forever incrementing the PWM duty */
     while (1) {
-        int mask = EVT_PWMPRINT + EVT_PWMSETDUTY;
-        events = Event_pend(evtPWM, mask, Event_Id_NONE, BIOS_WAIT_FOREVER);
+        int mask = EVT_PWMPRINT + EVT_PWMSETDUTY + EVT_PWMSTART + EVT_PWMSTOP;
+        events = Event_pend(evtPWM, Event_Id_NONE, mask, BIOS_WAIT_FOREVER);
         if (events & EVT_PWMPRINT) {
-            pwm_print(pwm1);
+            printf("PWM period (us): %d\n", 0);//*TIMER1TAILR);
+            printf("PWM duty: %u\n", 0);//*TIMER1TAMATCHR);
+            fflush(stdout);
         } else if (events & EVT_PWMSETDUTY) {
-            PWM_setDuty(pwm1, pwmDuty);
+            *TIMER1TAMATCHR = pwmDuty;
+            //printf("PWM set duty\n");
+            //fflush(stdout);
+        } else if (events & EVT_PWMSTART) {
+            //printf("PWM start\n");
+            //fflush(stdout);
+            *TIMER1CTL |= (1<<0);
+        } else if (events & EVT_PWMSTOP) {
+            //printf("PWM stop\n");
+            //fflush(stdout);
+            *TIMER1CTL &= ~(1<<0);
         }
     }
 }
 
-void pwm_print(PWM_Handle pwm1)
-{
-    unsigned int t = PWM_getPeriodMicroSecs(pwm1);
-    printf("PWM period (us): %d\n", t);
-    printf("PWM duty: %u\n", pwmDuty);
-    fflush(stdout);
-}
 
-void pwm_start(/*#microsteps*/)
-{
-    /*
-     * PWMGenIntClear
-     * set isrPWMCounter -> #microsteps
-     * PWMGenIntTrigEnable
-     * PWMGenEnable
-     */
-}
-
-//void pwm_stop(void)
-//{
-
-    /*
-     * isrPWMCtl:
-     * TODO: add fault handler -> based on ADC input from encoder
-     *      PWMGenIntClear
-     *      lookup sin(x²)[isrPWMCounter] -> PWMGenPeriodSet
-     *      decrement isrPWMCounter
-     *      if isrPWMCounter == 0 -> PWMGenDisable; PWMGenIntTrigDisable
-     */
-//}
-
-void pwm_setDuty(uint16_t duty)
-{
-    //pwmDuty = duty;
-    //PWM_setDuty(pwm1, duty);
-}
 
 

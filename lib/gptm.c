@@ -15,6 +15,7 @@ int volatile * const GPIOAFSEL = (int *) 0x40025420;    //0x40025420; // APB - A
 int volatile * const GPIOPCTL = (int *) 0x4002552C;     //0x4002552C; // APB - AHB: 0x4002D52C
 
 
+#if(0)
 Void gptm_isr(UArg arg0)
 {
     // Clear the timer interrupt
@@ -42,10 +43,8 @@ Void gptm_isr(UArg arg0)
         GPIO_write(Board_LED2, 1);
         //GPIO_write(Board_LED0, 0);
     }
-
-
 }
-
+#endif
 
 
 void gptm_init(void)
@@ -113,58 +112,11 @@ void gptm_init(void)
     *TIMER1CTL |= (1<<0);
 
 
-
-
-
-
-
-
-
-
-
     *RCGCGPIO |= (1<<5);
     *GPIOFDEN |= (1<<2);
     *GPIOFDIR |= (1<<2);
     *GPIOAFSEL |= (1<<2);
     *GPIOPCTL |= (7<<8);
-
-
-#if (0)
-    uint32_t ui32Period;
-
-    //SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN);
-
-    Hwi_Handle hwi;
-    Error_Block eb;
-
-    Error_init(&eb);
-
-    /* Install interrupt handler */
-    hwi = Hwi_create(INT_TIMER0B, &gptm_isr, NULL, &eb);
-    if (hwi == NULL) {
-        System_abort("Can't create GPTM Hwi");
-    }
-
-
-    //SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
-
-    //SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
-    TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);
-
-    ui32Period = (SysCtlClockGet() / 10) / 2;
-    TimerLoadSet(TIMER0_BASE, TIMER_B, ui32Period -1);
-
-    IntEnable(INT_TIMER0B);
-    //TimerIntEnable(TIMER0_BASE, TIMER_TIMB_TIMEOUT);
-    //IntMasterEnable();
-    Hwi_enableInterrupt(INT_TIMER0B);
-
-    TimerEnable(TIMER0_BASE, TIMER_B);
-
-#endif
-
-
 }
 
 
