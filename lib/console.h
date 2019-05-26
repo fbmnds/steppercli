@@ -7,12 +7,13 @@
 #include <inttypes.h>
 
 #include <ti/sysbios/utils/Load.h>
+#include <ti/sysbios/knl/Task.h>
 
 #include "lib/settings.h"
-#include "lib/pwm.h"
+//#include "lib/pwm.h"
 
-extern Event_Handle evtPWM;
-extern uint16_t pwmDuty;
+//extern Event_Handle evtPWM;
+//extern uint16_t pwmDuty;
 
 Void consoleFxn(UArg arg0, UArg arg1);
 

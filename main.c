@@ -74,8 +74,8 @@ Char taskCStack[CONSOLESTACKSIZE];
 
 #define PWMSTACKSIZE     1536
 
-Task_Struct taskPWMStruct;
-Char taskPWMStack[PWMSTACKSIZE];
+//Task_Struct taskPWMStruct;
+//Char taskPWMStack[PWMSTACKSIZE];
 
 
 /*
@@ -88,7 +88,7 @@ int main(void)
     Board_initGPIO();
     Board_initUART();
     Board_initUSB(Board_USBDEVICE);
-    Board_initPWM();
+//    Board_initPWM();
 
     /* Construct BIOS objects */
     Task_Params taskCParams;
@@ -98,17 +98,21 @@ int main(void)
     taskCParams.stack = &taskCStack;
     Task_construct(&taskCStruct, (Task_FuncPtr)consoleFxn, &taskCParams, NULL);
 
+    /*
     Task_Params taskPWMParams;
 
     Task_Params_init(&taskPWMParams);
     taskPWMParams.stackSize = PWMSTACKSIZE;
     taskPWMParams.stack = &taskPWMStack;
     Task_construct(&taskPWMStruct, (Task_FuncPtr)pwmFxn, &taskPWMParams, NULL);
+    */
 
-    gptm_init();
+
 
     /* Turn on user LED */
-    GPIO_write(Board_LED2, Board_LED_ON);
+    GPIO_write(Board_LED0, Board_LED_ON);
+
+    gptm_init();
 
     /*
      *  Add the UART device to the system.

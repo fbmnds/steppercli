@@ -3,7 +3,7 @@
 
 static unsigned int count;
 static float distance;
-static uint32_t adjust;
+//static uint32_t adjust;
 static unsigned int sleepDur;
 static char input[128];
 static unsigned int cpuLoad;
@@ -51,7 +51,7 @@ void do_exit(void)
     fflush(stdin);
     if ((input[0] == 'y' || input[0] == 'Y') && input[1] == 0x00) {
         printf("Exiting console, goodbye.\n");
-        Task_exit();
+        //Task_exit();
     }
 }
 
@@ -69,11 +69,11 @@ void do_calc(void)
 void do_pwm_duty (void)
 {
     /* Adjust the PWM duty. */
-    printf("Enter duty (us): ");
-    fflush(stdout);
-    scanf("%" PRIu16, &pwmDuty);
-    fflush(stdin);
-    Event_post(evtPWM, EVT_PWMSETDUTY);
+    //printf("Enter duty (us): ");
+    //fflush(stdout);
+    //scanf("%" PRIu16, &pwmDuty);
+    //fflush(stdin);
+    //Event_post(evtPWM, EVT_PWMSETDUTY);
 }
 
 /*
@@ -102,14 +102,14 @@ Void consoleFxn(UArg arg0, UArg arg1)
         }
         else if (!strcmp(input, "pwm_print")) {
             /* Print PWM parameter*/
-            Event_post(evtPWM, EVT_PWMPRINT);
+            //Event_post(evtPWM, EVT_PWMPRINT);
         }
         else if (!strcmp(input, "pwm_stop")) {
             /* Stop PWM */
             ;
         }
         else if (!strcmp(input, "pwm_duty")) {
-            do_pwm_duty();
+            //do_pwm_duty();
         }
         else if (!strcmp(input, "sleep")) {
             do_sleep();

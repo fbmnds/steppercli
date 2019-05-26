@@ -16,6 +16,7 @@
 #include <xdc/runtime/System.h>
 #include <ti/drivers/GPIO.h>
 #include "Board.h"
+#include <ti/drivers/GPIO.h>
 
 
 void gptm_init(void);
