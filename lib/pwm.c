@@ -52,8 +52,8 @@ Void pwmFxn(UArg arg0, UArg arg1)
         int mask = EVT_PWMPRINT + EVT_PWMSETDUTY + EVT_PWMSTART + EVT_PWMSTOP;
         events = Event_pend(evtPWM, Event_Id_NONE, mask, BIOS_WAIT_FOREVER);
         if (events & EVT_PWMPRINT) {
-            printf("PWM period (us): %d\n", 0);//*TIMER1TAILR);
-            printf("PWM duty: %u\n", 0);//*TIMER1TAMATCHR);
+            printf("PWM period (us): %d\n", *TIMER1TAILR);
+            printf("PWM duty: %u\n", *TIMER1TAMATCHR);
             fflush(stdout);
         } else if (events & EVT_PWMSETDUTY) {
             *TIMER1TAMATCHR = pwmDuty;
