@@ -37,6 +37,7 @@
 
 #include "pwm.h"
 
+volatile uint16_t pwmDuty = 0;
 
 
 
@@ -56,17 +57,21 @@ Void pwmFxn(UArg arg0, UArg arg1)
             printf("PWM duty: %u\n", *TIMER1TAMATCHR);
             fflush(stdout);
         } else if (events & EVT_PWMSETDUTY) {
+            *TIMER1CTL &= ~(1<<0);
             *TIMER1TAMATCHR = pwmDuty;
+            *TIMER1CTL |= (1<<0);
             //printf("PWM set duty\n");
             //fflush(stdout);
+            //Event_post(evtPWM, EVT_PWMPRINT);
         } else if (events & EVT_PWMSTART) {
-            //printf("PWM start\n");
-            //fflush(stdout);
             *TIMER1CTL |= (1<<0);
+            printf("PWM start\n");
+            fflush(stdout);
         } else if (events & EVT_PWMSTOP) {
-            //printf("PWM stop\n");
-            //fflush(stdout);
             *TIMER1CTL &= ~(1<<0);
+            printf("PWM stop\n");
+            fflush(stdout);
+
         }
     }
 }

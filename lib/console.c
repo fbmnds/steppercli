@@ -105,7 +105,7 @@ Void consoleFxn(UArg arg0, UArg arg1)
             Event_post(evtPWM, EVT_PWMPRINT);
         }
         else if (!strcmp(input, "pwm_start")) {
-            /* Stop PWM */
+            /* Start PWM */
             Event_post(evtPWM, EVT_PWMSTART);
         }
         else if (!strcmp(input, "pwm_stop")) {

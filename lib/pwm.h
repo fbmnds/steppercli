@@ -21,7 +21,6 @@
 #include "gptm.h"
 
 extern Event_Handle evtPWM;
-static uint16_t pwmDuty = 0;
 
 extern int volatile * const RCGCTIMER;
 
