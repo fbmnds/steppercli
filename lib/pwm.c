@@ -9,7 +9,7 @@ void pwm_isr(void)
 {
     PWMGenIntClear(PWM1_BASE, PWM_GEN_0, PWM_ALL_INT_TR);
     pwmCount++;
-    //GPIO_toggle(Board_LED2_RED);
+    GPIO_toggle(Board_LED2_RED);
 }
 
 void pwm_init(void)
@@ -90,16 +90,16 @@ inline void pwm_stop(void)
 void pwm_update(void)
 {
 
-//    IntTrigger(PWM_INT_GEN_0);
-    PWMGenDisable(PWM1_BASE, PWM_GEN_1);
+    IntTrigger(PWM_INT_GEN_0);
+    PWMGenDisable(PWM1_BASE, PWM_GEN_0);
     // Set the period.
     //
-    PWMGenPeriodSet(PWM1_BASE, PWM_GEN_1, PWM_period);
+    PWMGenPeriodSet(PWM1_BASE, PWM_GEN_0, PWM_period);
     //
     // Set the pulse width of PWM1.
     //
-    PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1, PWM_duty);
-    PWMGenEnable(PWM1_BASE, PWM_GEN_1);
+    PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, PWM_duty);
+    PWMGenEnable(PWM1_BASE, PWM_GEN_0);
 }
 
 
