@@ -53,9 +53,9 @@ extern "C" {
 
 #define Board_LED_ON                EK_TM4C123GXL_LED_ON
 #define Board_LED_OFF               EK_TM4C123GXL_LED_OFF
-#define Board_LED0                  EK_TM4C123GXL_LED_BLUE
-#define Board_LED1                  EK_TM4C123GXL_LED_GREEN
-#define Board_LED2                  EK_TM4C123GXL_LED_RED
+#define Board_LED0_BLUE             EK_TM4C123GXL_LED_BLUE
+#define Board_LED1_GREEN            EK_TM4C123GXL_LED_GREEN
+#define Board_LED2_RED              EK_TM4C123GXL_LED_RED
 #define Board_BUTTON0               EK_TM4C123GXL_SW1
 #define Board_BUTTON1               EK_TM4C123GXL_SW2
 

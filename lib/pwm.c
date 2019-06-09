@@ -1,81 +1,119 @@
-/*
- * Copyright (c) 2015, Texas Instruments Incorporated
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * *  Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * *  Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * *  Neither the name of Texas Instruments Incorporated nor the names of
- *    its contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
-/*
- *  ======== pwm.c ========
- */
+#include "lib/pwm.h"
+// TivaWare(tm) Peripheral Driver Library USER’S GUIDE - SPMU298d, section 21
 
 
-#include "pwm.h"
-
-volatile uint16_t pwmDuty = 0;
+static uint32_t pwmCount;
 
 
-
-Void pwmFxn(UArg arg0, UArg arg1)
+void pwm_isr(void)
 {
-    UInt events;
-    //uint16_t pwmPeriod;
+    PWMGenIntClear(PWM1_BASE, PWM_GEN_0, PWM_ALL_INT_TR);
+    pwmCount++;
+    //GPIO_toggle(Board_LED2_RED);
+}
 
-    gptm_init();
+void pwm_init(void)
+{
+    //SysCtlClockSet( SYSCTL_SYSDIV_2_5 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ );
+    SysCtlPWMClockSet( SYSCTL_PWMDIV_64 );
 
+#if 1
+    // Enable the GPIO peripheral
+    //
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
+    //
+    // Wait for the GPIO module to be ready.
+    //
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOD))
+        ;
+#endif
 
-    while (1) {
-        int mask = EVT_PWMPRINT + EVT_PWMSETDUTY + EVT_PWMSTART + EVT_PWMSTOP;
-        events = Event_pend(evtPWM, Event_Id_NONE, mask, BIOS_WAIT_FOREVER);
-        if (events & EVT_PWMPRINT) {
-            printf("PWM period (us): %d\n", *TIMER1TAILR);
-            printf("PWM duty: %u\n", *TIMER1TAMATCHR);
-            fflush(stdout);
-        } else if (events & EVT_PWMSETDUTY) {
-            *TIMER1CTL &= ~(1<<0);
-            *TIMER1TAMATCHR = pwmDuty;
-            *TIMER1CTL |= (1<<0);
-            //printf("PWM set duty\n");
-            //fflush(stdout);
-            //Event_post(evtPWM, EVT_PWMPRINT);
-        } else if (events & EVT_PWMSTART) {
-            *TIMER1CTL |= (1<<0);
-            printf("PWM start\n");
-            fflush(stdout);
-        } else if (events & EVT_PWMSTOP) {
-            *TIMER1CTL &= ~(1<<0);
-            printf("PWM stop\n");
-            fflush(stdout);
+    GPIOPinTypePWM( GPIO_PORTD_BASE, GPIO_PIN_0 );
+    GPIOPinConfigure( GPIO_PD0_M1PWM0 );
 
-        }
-    }
+    // Enable the PWM1 peripheral
+    //
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM1);
+    //
+    // Wait for the PWM1 module to be ready.
+    //
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_PWM1))
+        ;
+    //
+    // Configure the PWM generator for count down mode with immediate updates
+    // to the parameters.
+    //
+    PWMGenConfigure(PWM1_BASE, PWM_GEN_0,
+                    PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC);
+    //
+    // Set the period.
+    //
+    PWMGenPeriodSet(PWM1_BASE, PWM_GEN_0, F_MAX_CT);
+    //
+    // Set the pulse width of PWM1 for a single microstep.
+    //
+    PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, 2500);
+    //
+    // Start the timers in generator 0.
+    //
+    PWMOutputState(PWM1_BASE, PWM_OUT_0_BIT, true);
+    PWMGenEnable(PWM1_BASE, PWM_GEN_0);
+
+    //PWMGenIntRegister(PWM1_BASE, PWM_GEN_0, &pwm_isr);
+    PWMGenIntTrigEnable ( PWM1_BASE , PWM_GEN_0 , PWM_INT_CNT_ZERO ) ;
+    //PWMIntEnable ( PWM1_BASE , PWM_INT_GEN_0 ) ;
+
+    //IntRegister(INT_PWM1_0, &pwm_isr);
+    //IntEnable(INT_PWM1_0);
+
+    //IntMasterEnable();
+
 }
 
 
+inline void pwm_start(void)
+{
+    // Enable the outputs.
+    //
+    //PWMOutputState(PWM1_BASE, PWM_OUT_ALL_BITS, true);
+}
 
 
+inline void pwm_stop(void)
+{
+    // Disable the outputs.
+    //
+    //PWMOutputState(PWM1_BASE, PWM_OUT_ALL_BITS, false);
+}
+
+
+void pwm_update(void)
+{
+
+//    IntTrigger(PWM_INT_GEN_0);
+    PWMGenDisable(PWM1_BASE, PWM_GEN_1);
+    // Set the period.
+    //
+    PWMGenPeriodSet(PWM1_BASE, PWM_GEN_1, PWM_period);
+    //
+    // Set the pulse width of PWM1.
+    //
+    PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1, PWM_duty);
+    PWMGenEnable(PWM1_BASE, PWM_GEN_1);
+}
+
+
+void pwm_setPeriod(uint32_t pwmPeriod)
+{
+    // Set the period.
+    //
+    PWMGenPeriodSet(PWM1_BASE, PWM_GEN_1, pwmPeriod);
+}
+
+
+void pwm_setDuty(uint32_t pwmDuty)
+{
+    // Set the pulse width of PWM1.
+    //
+    PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1, pwmDuty);
+}

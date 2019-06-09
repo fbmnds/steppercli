@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, Texas Instruments Incorporated
+ * Copyright (c) 2015, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,110 +31,86 @@
  */
 
 /*
- *    ======== uartconsole.c ========
+ *  ======== main.c ========
  */
-
-#include <file.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <inttypes.h>
-
 /* XDCtools Header files */
 #include <xdc/std.h>
-#include <xdc/runtime/Error.h>
 #include <xdc/runtime/System.h>
 
 /* BIOS Header files */
 #include <ti/sysbios/BIOS.h>
-#include <ti/sysbios/utils/Load.h>
 #include <ti/sysbios/knl/Task.h>
 
 /* TI-RTOS Header files */
 #include <ti/drivers/GPIO.h>
-#include <ti/drivers/UART.h>
-#include <UARTUtils.h>
-#include <USBCDCD_LoggerIdle.h>
+// #include <ti/drivers/I2C.h>
+// #include <ti/drivers/SDSPI.h>
+// #include <ti/drivers/SPI.h>
+// #include <ti/drivers/UART.h>
+// #include <ti/drivers/Watchdog.h>
+// #include <ti/drivers/WiFi.h>
 
-/* Example/Board Header files */
+/* Board Header file */
 #include "Board.h"
 
-/* Application Header files */
-#include "lib/console.h"
-#include "lib/settings.h"
 #include "lib/pwm.h"
-#include "lib/gptm.h"
 
+#define TASKSTACKSIZE   512
 
-#define CONSOLESTACKSIZE     1536
+Task_Struct task0Struct;
+Char task0Stack[TASKSTACKSIZE];
 
-Task_Struct taskCStruct;
-Char taskCStack[CONSOLESTACKSIZE];
-
-#define PWMSTACKSIZE     1536
-
-Task_Struct taskPWMStruct;
-Char taskPWMStack[PWMSTACKSIZE];
-
+/*
+ *  ======== heartBeatFxn ========
+ *  Toggle the Board_LED0. The Task_sleep is determined by arg0 which
+ *  is configured for the heartBeat Task instance.
+ */
+Void heartBeatFxn(UArg arg0, UArg arg1)
+{
+    //pwm_start();
+    while (1) {
+        Task_sleep((UInt)arg0);
+        GPIO_toggle(Board_LED0_BLUE);
+        pwm_update();
+    }
+}
 
 /*
  *  ======== main ========
  */
 int main(void)
 {
-    /* Call board init functions. */
+    Task_Params taskParams;
+
+    /* Call board init functions */
     Board_initGeneral();
     Board_initGPIO();
-    Board_initUART();
-    Board_initUSB(Board_USBDEVICE);
+    // Board_initI2C();
+    // Board_initSDSPI();
+    // Board_initSPI();
+    // Board_initUART();
+    // Board_initUSB(Board_USBDEVICE);
+    // Board_initWatchdog();
+    // Board_initWiFi();
 
-    /* Construct BIOS objects */
-    Task_Params taskCParams;
-    Task_Params_init(&taskCParams);
-    taskCParams.stackSize = CONSOLESTACKSIZE;
-    taskCParams.stack = &taskCStack;
-    Task_construct(&taskCStruct, (Task_FuncPtr)consoleFxn, &taskCParams, NULL);
-
-    Task_Params taskPWMParams;
-    Task_Params_init(&taskPWMParams);
-    taskPWMParams.stackSize = PWMSTACKSIZE;
-    taskPWMParams.stack = &taskPWMStack;
-    Task_construct(&taskPWMStruct, (Task_FuncPtr)pwmFxn, &taskPWMParams, NULL);
+    /* Construct heartBeat Task  thread */
+    Task_Params_init(&taskParams);
+    taskParams.arg0 = 1000;
+    taskParams.stackSize = TASKSTACKSIZE;
+    taskParams.stack = &task0Stack;
+    Task_construct(&task0Struct, (Task_FuncPtr)heartBeatFxn, &taskParams, NULL);
 
     /* Turn on user LED */
-    GPIO_write(Board_LED0, Board_LED_ON);
+    GPIO_write(Board_LED0_BLUE, Board_LED_ON);
+    //GPIO_write(Board_LED2_RED, Board_LED_ON);
 
-    /*
-     *  Add the UART device to the system.
-     *  All UART peripherals must be setup and the module must be initialized
-     *  before opening.  This is done by Board_initUART().  The functions used
-     *  are implemented in UARTUtils.c.
-     */
-    add_device("UART", _MSA, UARTUtils_deviceopen,
-               UARTUtils_deviceclose, UARTUtils_deviceread,
-               UARTUtils_devicewrite, UARTUtils_devicelseek,
-               UARTUtils_deviceunlink, UARTUtils_devicerename);
+    /* Initialize PWM */
+    pwm_init();
 
-    /* Open UART0 for writing to stdout and set buffer */
-    freopen("UART:0", "w", stdout);
-    setvbuf(stdout, NULL, _IOLBF, 128);
-
-    /* Open UART0 for reading from stdin and set buffer */
-    freopen("UART:0", "r", stdin);
-    setvbuf(stdin, NULL, _IOLBF, 128);
-
-    /*
-     *  Initialize UART port 0 used by SysCallback.  This and other SysCallback
-     *  UART functions are implemented in UARTUtils.c. Calls to System_printf
-     *  will go to UART0, the same as printf.
-     */
-    UARTUtils_systemInit(0);
-
-    System_printf("Starting the UART Console example\n");
-
-    /* Initialize the USB CDC device for logging transport */
-    USBCDCD_init();
+    System_printf("Starting the example\nSystem provider is set to SysMin. "
+                  "Halt the target to view any SysMin contents in ROV.\n");
+    /* SysMin will only print to the console when you call flush or exit */
+    System_flush();
 
     /* Start BIOS */
     BIOS_start();
