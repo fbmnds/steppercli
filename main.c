@@ -42,24 +42,33 @@
 #include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/knl/Task.h>
 
-
 /* TI-RTOS Header files */
 #include <ti/drivers/GPIO.h>
 #include <tm4c/Board.h>
 // #include <ti/drivers/I2C.h>
 // #include <ti/drivers/SDSPI.h>
 // #include <ti/drivers/SPI.h>
-// #include <ti/drivers/UART.h>
+#include <ti/drivers/UART.h>
 // #include <ti/drivers/Watchdog.h>
 // #include <ti/drivers/WiFi.h>
+#include "tm4c/UARTUtils.h"
+#include "tm4c/USBCDCD_LoggerIdle.h"
 
-/* Board Header file */
+/* Application Header files */
+#include "lib/console.h"
+#include "lib/settings.h"
 #include "lib/pwm.h"
+
 
 #define TASKSTACKSIZE   512
 
 Task_Struct task0Struct;
 Char task0Stack[TASKSTACKSIZE];
+
+#define CONSOLESTACKSIZE     1536
+
+Task_Struct taskCStruct;
+Char taskCStack[CONSOLESTACKSIZE];
 
 /*
  *  ======== heartBeatFxn ========
@@ -93,6 +102,7 @@ int main(void)
     // Board_initUSB(Board_USBDEVICE);
     // Board_initWatchdog();
     // Board_initWiFi();
+    Board_initUSB(Board_USBDEVICE);
 
     /* Construct heartBeat Task  thread */
     Task_Params_init(&taskParams);
@@ -101,9 +111,42 @@ int main(void)
     taskParams.stack = &task0Stack;
     Task_construct(&task0Struct, (Task_FuncPtr)heartBeatFxn, &taskParams, NULL);
 
+    /* Construct console Task  thread */
+    Task_Params taskCParams;
+    Task_Params_init(&taskCParams);
+    taskCParams.stackSize = CONSOLESTACKSIZE;
+    taskCParams.stack = &taskCStack;
+    Task_construct(&taskCStruct, (Task_FuncPtr)consoleFxn, &taskCParams, NULL);
+
     /* Turn on user LED */
     GPIO_write(Board_LED0_BLUE, Board_LED_ON);
     //GPIO_write(Board_LED2_RED, Board_LED_ON);
+
+    /*
+     *  Add the UART device to the system.
+     *  All UART peripherals must be setup and the module must be initialized
+     *  before opening.  This is done by Board_initUART().  The functions used
+     *  are implemented in UARTUtils.c.
+     */
+    add_device("UART", _MSA, UARTUtils_deviceopen,
+               UARTUtils_deviceclose, UARTUtils_deviceread,
+               UARTUtils_devicewrite, UARTUtils_devicelseek,
+               UARTUtils_deviceunlink, UARTUtils_devicerename);
+
+    /* Open UART0 for writing to stdout and set buffer */
+    freopen("UART:0", "w", stdout);
+    setvbuf(stdout, NULL, _IOLBF, 128);
+
+    /* Open UART0 for reading from stdin and set buffer */
+    freopen("UART:0", "r", stdin);
+    setvbuf(stdin, NULL, _IOLBF, 128);
+
+    /*
+     *  Initialize UART port 0 used by SysCallback.  This and other SysCallback
+     *  UART functions are implemented in UARTUtils.c. Calls to System_printf
+     *  will go to UART0, the same as printf.
+     */
+    UARTUtils_systemInit(0);
 
     /* Initialize PWM */
     pwm_init();

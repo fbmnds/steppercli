@@ -30,13 +30,14 @@
 #include "../tm4c/Board.h"
 
 
+
 #define F_MIN_CT     37500
 #define F_MAX_CT      5000
 #define MICROSTEP_CT   100
 
-static uint32_t volatile PWM_period = F_MAX_CT;
-static uint32_t volatile PWM_duty   = 2500;
-static uint32_t volatile pwmCount;
+static volatile uint32_t PWM_period = F_MAX_CT;
+static volatile uint32_t PWM_duty   = 2500;
+static volatile uint32_t pwmCount;
 
 void pwm_isr(void);
 void pwm_init(void);

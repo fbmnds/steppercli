@@ -83,7 +83,7 @@ inline void pwm_start(void)
 {
     // Enable the outputs.
     //
-    //PWMOutputState(PWM1_BASE, PWM_OUT_ALL_BITS, true);
+    PWMOutputState(PWM1_BASE, PWM_OUT_0_BIT, true);
 }
 
 
@@ -91,7 +91,7 @@ inline void pwm_stop(void)
 {
     // Disable the outputs.
     //
-    //PWMOutputState(PWM1_BASE, PWM_OUT_ALL_BITS, false);
+    PWMOutputState(PWM1_BASE, PWM_OUT_0_BIT, false);
 }
 
 
