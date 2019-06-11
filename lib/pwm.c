@@ -97,7 +97,7 @@ inline void pwm_stop(void)
 
 void pwm_update(void)
 {
-    PWMGenDisable(PWM1_BASE, PWM_GEN_0);
+    //PWMGenDisable(PWM1_BASE, PWM_GEN_0);
     // Set the period.
     //
     PWMGenPeriodSet(PWM1_BASE, PWM_GEN_0, PWM_period);
@@ -105,7 +105,7 @@ void pwm_update(void)
     // Set the pulse width of PWM1.
     //
     PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, PWM_duty);
-    PWMGenEnable(PWM1_BASE, PWM_GEN_0);
+    //PWMGenEnable(PWM1_BASE, PWM_GEN_0);
 }
 
 

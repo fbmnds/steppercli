@@ -81,7 +81,6 @@ Void heartBeatFxn(UArg arg0, UArg arg1)
     while (1) {
         Task_sleep((UInt)arg0);
         GPIO_toggle(Board_LED0_BLUE);
-        pwm_update();
     }
 }
 
@@ -99,10 +98,10 @@ int main(void)
     // Board_initSDSPI();
     // Board_initSPI();
     Board_initUART();
-    // Board_initUSB(Board_USBDEVICE);
+    Board_initUSB(Board_USBDEVICE);
     // Board_initWatchdog();
     // Board_initWiFi();
-    Board_initUSB(Board_USBDEVICE);
+
 
     /* Construct heartBeat Task  thread */
     Task_Params_init(&taskParams);

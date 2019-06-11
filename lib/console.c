@@ -73,7 +73,8 @@ void do_pwm_duty (void)
     fflush(stdout);
     scanf("%" PRIu32, &PWM_duty);
     fflush(stdin);
-    pwm_update();
+    PWMGenPeriodSet(PWM1_BASE, PWM_GEN_0, PWM_period);
+    PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0, PWM_duty);
 }
 
 /*
