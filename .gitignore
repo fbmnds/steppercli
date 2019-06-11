@@ -2,6 +2,7 @@ RemoteSystemsTempFiles/
 .jxbrowser-data/
 dvt/
 .launches/
+.config/
 .xdchelp
 .~*
 # ignore generated files

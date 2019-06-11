@@ -1,16 +1,27 @@
 #include "lib/pwm.h"
 // TivaWare(tm) Peripheral Driver Library USER’S GUIDE - SPMU298d, section 21
 
+#define USE_SWI 0
 
-static uint32_t pwmCount;
-
+void pwm_swi(void)
+{
+#if Use_SWI
+    pwmCount++;
+    GPIO_toggle(Board_LED2_RED);
+#endif
+}
 
 void pwm_isr(void)
 {
-    PWMGenIntClear(PWM1_BASE, PWM_GEN_0, PWM_ALL_INT_TR);
+    PWMGenIntClear(PWM1_BASE, PWM_GEN_0, PWM_INT_CNT_ZERO);
+#if Use_SWI
+    Swi_post(PWMswi);
+#else
     pwmCount++;
     GPIO_toggle(Board_LED2_RED);
+#endif
 }
+
 
 void pwm_init(void)
 {
@@ -60,13 +71,13 @@ void pwm_init(void)
     PWMGenEnable(PWM1_BASE, PWM_GEN_0);
 
     //PWMGenIntRegister(PWM1_BASE, PWM_GEN_0, &pwm_isr);
-    PWMGenIntTrigEnable ( PWM1_BASE , PWM_GEN_0 , PWM_INT_CNT_ZERO ) ;
-    //PWMIntEnable ( PWM1_BASE , PWM_INT_GEN_0 ) ;
+    PWMGenIntTrigEnable (PWM1_BASE, PWM_GEN_0, PWM_INT_CNT_ZERO) ;
+    PWMIntEnable (PWM1_BASE, PWM_INT_GEN_0) ;
 
     //IntRegister(INT_PWM1_0, &pwm_isr);
-    //IntEnable(INT_PWM1_0);
+    IntEnable(INT_PWM1_0);
 
-    //IntMasterEnable();
+    IntMasterEnable();
 
 }
 
@@ -89,8 +100,6 @@ inline void pwm_stop(void)
 
 void pwm_update(void)
 {
-
-    IntTrigger(PWM_INT_GEN_0);
     PWMGenDisable(PWM1_BASE, PWM_GEN_0);
     // Set the period.
     //

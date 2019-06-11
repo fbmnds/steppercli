@@ -4,6 +4,16 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/* XDCtools Header files */
+#include <xdc/std.h>
+#include <xdc/cfg/global.h>
+#include <xdc/runtime/System.h>
+
+/* BIOS Header files */
+#include <ti/sysbios/BIOS.h>
+#include <ti/sysbios/knl/Task.h>
+#include <ti/sysbios/knl/Swi.h>
+
 #include <ti/drivers/GPIO.h>
 
 #include <driverlib/sysctl.h>
@@ -27,6 +37,7 @@
 
 static uint32_t volatile PWM_period = F_MAX_CT;
 static uint32_t volatile PWM_duty   = 2500;
+static uint32_t volatile pwmCount;
 
 void pwm_isr(void);
 void pwm_init(void);

@@ -35,11 +35,13 @@
  */
 /* XDCtools Header files */
 #include <xdc/std.h>
+#include <xdc/cfg/global.h>
 #include <xdc/runtime/System.h>
 
 /* BIOS Header files */
 #include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/knl/Task.h>
+
 
 /* TI-RTOS Header files */
 #include <ti/drivers/GPIO.h>
