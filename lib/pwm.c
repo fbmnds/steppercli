@@ -70,13 +70,10 @@ void pwm_init(void)
     PWMOutputState(PWM1_BASE, PWM_OUT_0_BIT, true);
     PWMGenEnable(PWM1_BASE, PWM_GEN_0);
 
-    //PWMGenIntRegister(PWM1_BASE, PWM_GEN_0, &pwm_isr);
     PWMGenIntTrigEnable (PWM1_BASE, PWM_GEN_0, PWM_INT_CNT_ZERO) ;
     PWMIntEnable (PWM1_BASE, PWM_INT_GEN_0) ;
 
-    //IntRegister(INT_PWM1_0, &pwm_isr);
     IntEnable(INT_PWM1_0);
-
     IntMasterEnable();
 
 }

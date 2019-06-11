@@ -27,9 +27,8 @@
 #include "inc/tm4c123gh6pm.h"
 #include "inc/hw_memmap.h"
 
-#include "Board.h"
+#include "../tm4c/Board.h"
 
-#define PWM_ALL_INT_TR (PWM_INT_CNT_ZERO|PWM_INT_CNT_LOAD|PWM_INT_CNT_AU|PWM_INT_CNT_AD|PWM_INT_CNT_BU|PWM_INT_CNT_BD|PWM_TR_CNT_ZERO|PWM_TR_CNT_LOAD|PWM_TR_CNT_AU|PWM_TR_CNT_AD|PWM_TR_CNT_BU|PWM_TR_CNT_BD)
 
 #define F_MIN_CT     37500
 #define F_MAX_CT      5000

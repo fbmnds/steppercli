@@ -58,7 +58,7 @@
 #include <driverlib/uart.h>
 #include <driverlib/udma.h>
 
-#include "EK_TM4C123GXL.h"
+#include <tm4c/EK_TM4C123GXL.h>
 
 #ifndef TI_DRIVERS_UART_DMA
 #define TI_DRIVERS_UART_DMA 0

@@ -45,6 +45,7 @@
 
 /* TI-RTOS Header files */
 #include <ti/drivers/GPIO.h>
+#include <tm4c/Board.h>
 // #include <ti/drivers/I2C.h>
 // #include <ti/drivers/SDSPI.h>
 // #include <ti/drivers/SPI.h>
@@ -53,8 +54,6 @@
 // #include <ti/drivers/WiFi.h>
 
 /* Board Header file */
-#include "Board.h"
-
 #include "lib/pwm.h"
 
 #define TASKSTACKSIZE   512
@@ -90,7 +89,7 @@ int main(void)
     // Board_initI2C();
     // Board_initSDSPI();
     // Board_initSPI();
-    // Board_initUART();
+    Board_initUART();
     // Board_initUSB(Board_USBDEVICE);
     // Board_initWatchdog();
     // Board_initWiFi();
