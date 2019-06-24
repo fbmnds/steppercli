@@ -68,17 +68,30 @@ void parse_float(char* line, size_t line_length, int idx, maybe_float_t* mf)
 void parse_line(char* line, size_t line_length)
 {
     char c;
-    int i, idx = 0;
+    int i, idx;
     maybe_float_t* mf;
+
+    i = 0;
 
     while (line[i] == ' ')
         i++;
     idx = i;
 
+    if (i == line_length) {
+        parser_status = OK;
+        return;
+    }
+
+    if (i < line_length && line[i] == '(') {
+        parser_status = OK;
+        return;
+    }
+
     for (; i<line_length; i++) {
         c = line[i] >= 'a' && line[i] <= 'z' ? line[i] - 'a' + 'A' : line[i];
         if (c == 'G') {
             if (i == idx && i+2<line_length && line[i+1] == '9' && line[i+2] == '0') {
+                i +=3;
                 break;
             } else {
                 parser_status = G_Error;
@@ -88,43 +101,38 @@ void parse_line(char* line, size_t line_length)
             i++;
             parse_float(line, line_length, i, mf);
             i = mf->pos;
-            if (mf->ok) {
-                switch (c) {
-                case 'X':
+           switch (c) {
+            case 'X':
+                if (mf->ok) {
                     X = mf->f;
-                    break;
-                case 'Y':
-                    Y = mf->f;
-                    break;
-                case 'Z':
-                    Z = mf->f;
-                    break;
-                case 'F':
-                    F = mf->f;
-                    break;
-                default:
-                    /* never */
-                    break;
-                }
-            } else {
-                switch (c) {
-                case 'X':
+                } else {
                     parser_status = X_Error;
-                    break;
-                case 'Y':
-                    parser_status = Y_Error;
-                    break;
-                case 'Z':
-                    parser_status = Z_Error;
-                    break;
-                case 'F':
-                    parser_status = F_Error;
-                    break;
-                default:
-                    /* never */
-                    break;
                 }
-                return;
+                break;
+            case 'Y':
+                if (mf->ok) {
+                    Y = mf->f;
+                } else {
+                    parser_status = Y_Error;
+                }
+                break;
+            case 'Z':
+                if (mf->ok) {
+                    Z = mf->f;
+                } else {
+                    parser_status = Z_Error;
+                }
+                break;
+            case 'F':
+                if (mf->ok) {
+                    F = mf->f;
+                } else {
+                    parser_status = F_Error;
+                }
+                break;
+            default:
+                /* never */
+                break;
             }
             break;
         }
