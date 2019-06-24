@@ -2,6 +2,8 @@
 #define LIB_PARSER_H_
 
 #include <stddef.h>
+#include <stdbool.h>
+
 
 typedef enum {
     G90 = 0
@@ -16,6 +18,9 @@ typedef enum {
     F_Error,
     Internal_Error
 } parser_status_t;
+
+static float X, Y, Z, F;
+static parser_status_t parser_status;
 
 //#define IGNORE_WS(s,i) (while ((s)[(i)++] == ' '))
 //#define TO_UPPER(c)    do { c >= 'a' && c <= 'z' ? c - 'a' + 'A' : c; } until (1);
