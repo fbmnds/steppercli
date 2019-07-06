@@ -7,6 +7,7 @@ static float distance;
 static unsigned int sleepDur;
 #define INPUT_LEN 128
 static char input[INPUT_LEN];
+static char parse_buffer[INPUT_LEN];
 static unsigned int cpuLoad;
 
 void print_greeting(void)
@@ -68,7 +69,7 @@ void do_calc(void)
     fflush(stdout);
 }
 
-void parse_swi(void)
+void do_parse(void)
 {
     int i;
 
@@ -78,9 +79,10 @@ void parse_swi(void)
     printf("Enter a G-code command: ");
     fflush(stdout);
     scanf("%s", input);
+    for (i=0; i<INPUT_LEN;i++) parse_buffer[i] = input[i];
     fflush(stdin);
     parse_reset();
-    parse_line(input, INPUT_LEN);
+    parse_line(parse_buffer, INPUT_LEN);
     if (parser_status == OK)
         printf("OK\n");
     else
@@ -126,7 +128,7 @@ Void consoleFxn(UArg arg0, UArg arg1)
             do_calc();
         }
         else if (!strcmp(input, "gcode")) {
-            Swi_post(Parseswi);
+            do_parse();
         }
         else if (!strcmp(input, "pwm_print")) {
             /* Print PWM parameter*/

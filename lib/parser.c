@@ -136,8 +136,8 @@ void parse_line(char* line, size_t line_length)
             default:
                 /* never */
                 break;
-            }
-            continue;
+           }
+           break;
         }
     }
     parser_status = OK;
