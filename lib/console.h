@@ -11,6 +11,7 @@
 
 #include "lib/settings.h"
 #include "lib/pwm.h"
+#include "lib/parser.h"
 
 
 extern volatile uint32_t PWM_period;

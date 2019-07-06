@@ -5,7 +5,8 @@ static unsigned int count;
 static float distance;
 //static uint32_t adjust;
 static unsigned int sleepDur;
-static char input[128];
+#define INPUT_LEN 128
+static char input[INPUT_LEN];
 static unsigned int cpuLoad;
 
 void print_greeting(void)
@@ -24,6 +25,7 @@ void print_valid_cmds(void)
     printf("Valid commands:\n"
     "- load: Get the CPU and task load.\n"
     "- calc: Calculate microsteps per distance [mm].\n"
+    "- gcode: Parse G-code.\n"
     "- pwm_start: Start PWM.\n"
     "- pwm_stop: Stop PWM.\n"
     "- pwm_duty: Adjust PWM load.\n"
@@ -66,6 +68,28 @@ void do_calc(void)
     fflush(stdout);
 }
 
+void do_gcode(void)
+{
+    int i;
+
+    fflush(stdin);
+    for (i=0; i<INPUT_LEN;i++) input[i] = '\0';
+    /* Request G-code */
+    printf("Enter a G-code command: ");
+    fflush(stdout);
+    scanf("%s", input);
+    fflush(stdin);
+    parse_reset();
+    parse_line(input, INPUT_LEN);
+    if (parser_status == OK)
+        printf("OK\n");
+    else
+        printf("Error code %d\n", parser_status);
+    if (g_code == G90) printf("G90 ");
+    printf("X %f Y %f Z %f F %f", X, Y, Z, F);
+    fflush(stdout);
+}
+
 void do_pwm_duty (void)
 {
     /* Adjust the PWM duty. */
@@ -100,6 +124,9 @@ Void consoleFxn(UArg arg0, UArg arg1)
         }
         else if (!strcmp(input, "calc")) {
             do_calc();
+        }
+        else if (!strcmp(input, "gcode")) {
+            do_gcode();
         }
         else if (!strcmp(input, "pwm_print")) {
             /* Print PWM parameter*/

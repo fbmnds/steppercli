@@ -6,7 +6,8 @@
 
 
 typedef enum {
-    G90 = 0
+    G90 = 0,
+    Undefined_Gcode
 } g_code_t;
 
 typedef enum {
@@ -16,11 +17,17 @@ typedef enum {
     Y_Error,
     Z_Error,
     F_Error,
-    Internal_Error
+    Internal_Error,
+    Undefined_Parser_Status
 } parser_status_t;
 
 static float X, Y, Z, F;
 static parser_status_t parser_status;
+static g_code_t g_code;
+
+void parse_reset(void);
+void parse_line(char* line, size_t line_length);
+
 
 //#define IGNORE_WS(s,i) (while ((s)[(i)++] == ' '))
 //#define TO_UPPER(c)    do { c >= 'a' && c <= 'z' ? c - 'a' + 'A' : c; } until (1);

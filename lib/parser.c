@@ -141,3 +141,13 @@ void parse_line(char* line, size_t line_length)
 }
 
 
+void parse_reset(void)
+{
+    parser_status = Undefined_Parser_Status;
+    g_code = Undefined_Gcode;
+    X = 0.0;
+    Y = 0.0;
+    Z = 0.0;
+    F = 0.0;
+}
+
