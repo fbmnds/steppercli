@@ -7,6 +7,7 @@
 #include <inttypes.h>
 
 #include <ti/sysbios/utils/Load.h>
+#include <ti/sysbios/knl/Swi.h>
 #include <ti/sysbios/knl/Task.h>
 
 #include "lib/settings.h"

@@ -6,9 +6,9 @@ typedef struct {
     float f;
     int pos;
 } maybe_float_t;
+static maybe_float_t* mf;
 
-
-void parse_float(char* line, size_t line_length, int idx, maybe_float_t* mf)
+void parse_float(char* line, size_t line_length, int idx)
 {
     int mantisse = 1;
     float sign;
@@ -17,6 +17,9 @@ void parse_float(char* line, size_t line_length, int idx, maybe_float_t* mf)
 
     int i;
 
+    mf->ok = false;
+    mf->f = -1.0;
+    mf->pos = 0;
 
     while (line[idx] == ' ')
         idx++;
@@ -26,7 +29,7 @@ void parse_float(char* line, size_t line_length, int idx, maybe_float_t* mf)
         idx++;
     }
 
-    for (i = idx; i<line_length; i++) {
+    for (i = idx; i<line_length-idx; i++) {
         f1 = line[i] >= '0' && line[i] <= '9' ? (float) (line[i] - '0') : -1.0;
         if (i == idx && f1<0.0) {
             mf->ok = false;
@@ -35,7 +38,7 @@ void parse_float(char* line, size_t line_length, int idx, maybe_float_t* mf)
         }
         if (line[i] == '.') {
             mantisse = 0;
-            break;
+            continue;
         }
         if (f1<0.0) {
             mf->ok = true;
@@ -45,17 +48,17 @@ void parse_float(char* line, size_t line_length, int idx, maybe_float_t* mf)
         }
         if (mantisse) {
             f = 10.0*f + f1;
-            break;
+            continue;
         } else {
             f2 /= 10.;
             f += f1*f2;
-            break;
+            continue;
         }
     }
-    if (i == line_length) {
+    if (i == line_length || line[i] != '\0') {
         mf->ok = true;
         mf->f = sign*f;
-        mf->pos = line_length;
+        mf->pos = i;
         return;
     } else {
         /* never */
@@ -69,7 +72,7 @@ void parse_line(char* line, size_t line_length)
 {
     char c;
     int i, idx;
-    maybe_float_t* mf;
+
 
     i = 0;
 
@@ -87,19 +90,19 @@ void parse_line(char* line, size_t line_length)
         return;
     }
 
-    for (; i<line_length; i++) {
+    for (; i<line_length && line[i] != '\0'; i++) {
         c = line[i] >= 'a' && line[i] <= 'z' ? line[i] - 'a' + 'A' : line[i];
         if (c == 'G') {
             if (i == idx && i+2<line_length && line[i+1] == '9' && line[i+2] == '0') {
-                i +=3;
-                break;
+                i +=2;
+                continue;
             } else {
                 parser_status = G_Error;
                 return;
             }
         } else if (c == 'X' || c == 'Y' || c == 'Z' || c == 'F') {
             i++;
-            parse_float(line, line_length, i, mf);
+            parse_float(line, line_length, i);
             i = mf->pos;
            switch (c) {
             case 'X':
@@ -134,7 +137,7 @@ void parse_line(char* line, size_t line_length)
                 /* never */
                 break;
             }
-            break;
+            continue;
         }
     }
     parser_status = OK;

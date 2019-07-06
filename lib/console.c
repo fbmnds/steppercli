@@ -68,7 +68,7 @@ void do_calc(void)
     fflush(stdout);
 }
 
-void do_gcode(void)
+void parse_swi(void)
 {
     int i;
 
@@ -126,7 +126,7 @@ Void consoleFxn(UArg arg0, UArg arg1)
             do_calc();
         }
         else if (!strcmp(input, "gcode")) {
-            do_gcode();
+            Swi_post(Parseswi);
         }
         else if (!strcmp(input, "pwm_print")) {
             /* Print PWM parameter*/
