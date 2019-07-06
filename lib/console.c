@@ -84,12 +84,12 @@ void do_parse(void)
     parse_reset();
     parse_line(parse_buffer, INPUT_LEN);
     if (parser_status == OK)
-        printf("OK\n");
+        System_printf("OK\n");
     else
-        printf("Error code %d\n", parser_status);
-    if (g_code == G90) printf("G90 ");
-    printf("X %f Y %f Z %f F %f", X, Y, Z, F);
-    fflush(stdout);
+        System_printf("Error code %d\n", parser_status);
+    if (g_code == G90) System_printf("G90 ");
+    System_printf("X %5.2f Y %5.2f Z %5.2f F %5.2f", X, Y, Z, F);
+    System_flush();
 }
 
 void do_pwm_duty (void)

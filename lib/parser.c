@@ -6,12 +6,14 @@ typedef struct {
     float f;
     int pos;
 } maybe_float_t;
-static maybe_float_t* mf;
+static maybe_float_t _mf;
+static maybe_float_t* mf = &_mf;
+
 
 void parse_float(char* line, size_t line_length, int idx)
 {
     int mantisse = 1;
-    float sign;
+    float sign = 1;
     float f1, f = 0.0;
     float f2 = 1.0;
 
@@ -19,7 +21,7 @@ void parse_float(char* line, size_t line_length, int idx)
 
     mf->ok = false;
     mf->f = -1.0;
-    mf->pos = 0;
+    mf->pos = idx;
 
     while (line[idx] == ' ')
         idx++;
@@ -29,7 +31,7 @@ void parse_float(char* line, size_t line_length, int idx)
         idx++;
     }
 
-    for (i = idx; i<line_length-idx; i++) {
+    for (i = idx; i<line_length; i++) {
         f1 = line[i] >= '0' && line[i] <= '9' ? (float) (line[i] - '0') : -1.0;
         if (i == idx && f1<0.0) {
             mf->ok = false;
@@ -103,41 +105,41 @@ void parse_line(char* line, size_t line_length)
         } else if (c == 'X' || c == 'Y' || c == 'Z' || c == 'F') {
             i++;
             parse_float(line, line_length, i);
-            i = mf->pos;
-           switch (c) {
+            i = mf->pos-1;
+            switch (c) {
             case 'X':
-                if (mf->ok) {
-                    X = mf->f;
-                } else {
+                if (!mf->ok) {
                     parser_status = X_Error;
+                    return;
                 }
+                X = mf->f;
                 break;
             case 'Y':
-                if (mf->ok) {
-                    Y = mf->f;
-                } else {
+                if (!mf->ok) {
                     parser_status = Y_Error;
+                    return;
                 }
+                Y = mf->f;
                 break;
             case 'Z':
-                if (mf->ok) {
-                    Z = mf->f;
-                } else {
+                if (!mf->ok) {
                     parser_status = Z_Error;
+                    return;
                 }
+                Z = mf->f;
                 break;
             case 'F':
-                if (mf->ok) {
-                    F = mf->f;
-                } else {
+                if (!mf->ok) {
                     parser_status = F_Error;
+                    return;
                 }
+                F = mf->f;
                 break;
             default:
                 /* never */
                 break;
-           }
-           break;
+            }
+            continue;
         }
     }
     parser_status = OK;
