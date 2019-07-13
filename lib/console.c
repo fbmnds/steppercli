@@ -1,4 +1,4 @@
-#include "lib/console.h"
+#include "console.h"
 
 
 static unsigned int count;
@@ -7,7 +7,7 @@ static float distance;
 static unsigned int sleepDur;
 #define INPUT_LEN 128
 static char input[INPUT_LEN];
-static char parse_buffer[INPUT_LEN];
+//static char parse_buffer[INPUT_LEN];
 static unsigned int cpuLoad;
 
 void print_greeting(void)
@@ -74,22 +74,29 @@ void do_parse(void)
     int i;
 
     fflush(stdin);
-    for (i=0; i<INPUT_LEN;i++) input[i] = '\0';
     /* Request G-code */
     printf("Enter a G-code command: ");
     fflush(stdout);
-    scanf("%s", input);
-    for (i=0; i<INPUT_LEN;i++) parse_buffer[i] = input[i];
     fflush(stdin);
+#if(0)
+    for (i=0; i<INPUT_LEN;i++) {
+        input[i] = getc(stdin);
+        if (input[i] == '\n' || input[i] == '\r') input[i] = '\0';
+        if (input[i] == '\0') break;
+    }
+#endif
+    scanf("%s", input);
+    //for (i=0; i<INPUT_LEN;i++) parse_buffer[i] = input[i];
+    //fflush(stdin);
     parse_reset();
-    parse_line(parse_buffer, INPUT_LEN);
+    parse_line(input, INPUT_LEN);
     if (parser_status == OK)
-        System_printf("OK\n");
+        printf("OK\n");
     else
-        System_printf("Error code %d\n", parser_status);
-    if (g_code == G90) System_printf("G90 ");
-    System_printf("X %5.2f Y %5.2f Z %5.2f F %5.2f", X, Y, Z, F);
-    System_flush();
+        printf("Error code %d\n", parser_status);
+    if (g_code == G90) printf("G90 ");
+    printf("X %5.2f Y %5.2f Z %5.2f F %5.2f\n", X, Y, Z, F);
+    fflush(stdin);
 }
 
 void do_pwm_duty (void)

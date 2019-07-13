@@ -21,9 +21,9 @@ typedef enum {
     Undefined_Parser_Status
 } parser_status_t;
 
-static float X, Y, Z, F;
-static parser_status_t parser_status;
-static g_code_t g_code;
+extern float X, Y, Z, F;
+extern parser_status_t parser_status;
+extern g_code_t g_code;
 
 void parse_reset(void);
 void parse_line(char* line, size_t line_length);

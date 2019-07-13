@@ -1,4 +1,4 @@
-#include "lib/pwm.h"
+#include "pwm.h"
 // TivaWare(tm) Peripheral Driver Library USER’S GUIDE - SPMU298d, section 21
 
 #define USE_SWI 0

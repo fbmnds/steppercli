@@ -1,4 +1,5 @@
-#include "lib/parser.h"
+#include "parser.h"
+
 
 
 typedef struct {
@@ -9,6 +10,9 @@ typedef struct {
 static maybe_float_t _mf;
 static maybe_float_t* mf = &_mf;
 
+float X, Y, Z, F;
+parser_status_t parser_status;
+g_code_t g_code;
 
 void parse_float(char* line, size_t line_length, int idx)
 {
@@ -97,6 +101,7 @@ void parse_line(char* line, size_t line_length)
         if (c == 'G') {
             if (i == idx && i+2<line_length && line[i+1] == '9' && line[i+2] == '0') {
                 i +=2;
+                g_code = G90;
                 continue;
             } else {
                 parser_status = G_Error;
