@@ -1,33 +1,39 @@
 #ifndef LIB_STEPPER_H_
 #define LIB_STEPPER_H_
 
+#include <stdint.h>
+#include <stdio.h>
+
+#include "settings.h"
 
 typedef enum {
-    X;
-    Y;
-    Z;
+    axisX,
+    axisY,
+    axisZ,
 #ifdef XA_AXIS
-    XA;
+    axisXA,
 #endif
 #ifdef XA_AXIS
-    YA;
+    axisYA,
 #endif
 #ifdef XA_AXIS
-    ZA;
+    axisZA,
 #endif
 } axis_t;
 
 typedef enum {
-    Forward = 1;
-    Backward = 0;
+    Forward = 1,
+    Backward = 0
 } direction_t;
 
 typedef struct {
     axis_t      axis;
     direction_t dir;
-    unit16_t    steps;
+    uint16_t    steps;
     uint16_t    freq;
 } st_block_t;
+
+void print_damped_interval(float lower_bound, float upper_bound);
 
 
 #endif /* LIB_STEPPER_H_ */

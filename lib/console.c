@@ -3,6 +3,7 @@
 
 static unsigned int count;
 static float distance;
+static float lower, upper;
 //static uint32_t adjust;
 static unsigned int sleepDur;
 #define INPUT_LEN 128
@@ -26,6 +27,7 @@ void print_valid_cmds(void)
     printf("Valid commands:\n"
     "- load: Get the CPU and task load.\n"
     "- calc: Calculate microsteps per distance [mm].\n"
+    "- damp: Print damped interval [lower, upper].\n"
     "- gcode: Parse G-code.\n"
     "- pwm_start: Start PWM.\n"
     "- pwm_stop: Stop PWM.\n"
@@ -69,9 +71,27 @@ void do_calc(void)
     fflush(stdout);
 }
 
+void do_damp(void)
+{
+    /* Damping over an interval */
+    printf("Enter interval lower bound: ");
+    fflush(stdout);
+    scanf("%f", &lower);
+    fflush(stdin);
+    printf("Enter interval upper bound: ");
+    fflush(stdout);
+    scanf("%f", &upper);
+    fflush(stdin);
+    print_damped_interval(lower, upper);
+    fflush(stdout);
+}
+
+
 void do_parse(void)
 {
+#if(0)
     int i;
+#endif
 
     fflush(stdin);
     /* Request G-code */
@@ -133,6 +153,9 @@ Void consoleFxn(UArg arg0, UArg arg1)
         }
         else if (!strcmp(input, "calc")) {
             do_calc();
+        }
+        else if (!strcmp(input, "damp")) {
+            do_damp();
         }
         else if (!strcmp(input, "gcode")) {
             do_parse();

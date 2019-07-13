@@ -55,9 +55,9 @@
 #include "tm4c/USBCDCD_LoggerIdle.h"
 
 /* Application Header files */
+//#include "lib/settings.h"
 #include "lib/console.h"
-#include "lib/settings.h"
-#include "lib/pwm.h"
+//#include "lib/pwm.h"
 
 
 #define TASKSTACKSIZE   512

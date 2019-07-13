@@ -12,9 +12,10 @@
 #include <ti/sysbios/knl/Swi.h>
 #include <ti/sysbios/knl/Task.h>
 
-#include "lib/settings.h"
-#include "lib/pwm.h"
-#include "lib/parser.h"
+#include "settings.h"
+#include "pwm.h"
+#include "parser.h"
+#include "stepper.h"
 
 
 extern volatile uint32_t PWM_period;
