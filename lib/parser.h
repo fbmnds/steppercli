@@ -8,7 +8,7 @@
 typedef enum {
     G90 = 0,
     Undefined_Gcode
-} g_code_t;
+} g_code_cmd_t;
 
 typedef enum {
     OK = 1,
@@ -21,12 +21,22 @@ typedef enum {
     Undefined_Parser_Status
 } parser_status_t;
 
-extern float X, Y, Z, F;
-extern parser_status_t parser_status;
-extern g_code_t g_code;
+typedef struct {
+    float X;
+    float Y;
+    float Z;
+    float F;
+} g_xyzf_t;
 
-void parse_reset(void);
-void parse_line(char* line, size_t line_length);
+typedef struct {
+    g_xyzf_t* g_xyzf;
+    parser_status_t parser_status;
+    g_code_cmd_t g_code;
+} parsed_g_code_t;
+
+
+void parse_reset(parsed_g_code_t* pgc);
+void parse_line(char* line, size_t line_length, parsed_g_code_t* pgc);
 
 
 //#define IGNORE_WS(s,i) (while ((s)[(i)++] == ' '))

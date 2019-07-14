@@ -2,14 +2,22 @@
 
 
 static unsigned int count;
-static float distance;
-static float lower, upper;
-//static uint32_t adjust;
-static unsigned int sleepDur;
 #define INPUT_LEN 128
 static char input[INPUT_LEN];
-//static char parse_buffer[INPUT_LEN];
+
+static float distance;
+
+static float lower, upper;
+
+static unsigned int sleepDur;
+
 static unsigned int cpuLoad;
+
+static g_xyzf_t _g_xyzf;
+static g_xyzf_t* g_xyzf = &_g_xyzf;
+static parsed_g_code_t _pgc;
+static parsed_g_code_t* pgc = &_pgc;
+
 
 void print_greeting(void)
 {
@@ -106,16 +114,15 @@ void do_parse(void)
     }
 #endif
     scanf("%s", input);
-    //for (i=0; i<INPUT_LEN;i++) parse_buffer[i] = input[i];
-    //fflush(stdin);
-    parse_reset();
-    parse_line(input, INPUT_LEN);
-    if (parser_status == OK)
+    pgc->g_xyzf = g_xyzf;
+    parse_reset(pgc);
+    parse_line(input, INPUT_LEN, pgc);
+    if (pgc->parser_status == OK)
         printf("OK\n");
     else
-        printf("Error code %d\n", parser_status);
-    if (g_code == G90) printf("G90 ");
-    printf("X %5.2f Y %5.2f Z %5.2f F %5.2f\n", X, Y, Z, F);
+        printf("Error code %d\n", pgc->parser_status);
+    if (pgc->g_code == G90) printf("G90 ");
+    printf("X %5.2f Y %5.2f Z %5.2f F %5.2f\n", pgc->g_xyzf->X, pgc->g_xyzf->Y, pgc->g_xyzf->Z, pgc->g_xyzf->F);
     fflush(stdin);
 }
 

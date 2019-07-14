@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include "settings.h"
+#include "parser.h"
 
 typedef enum {
     axisX,
@@ -33,7 +34,10 @@ typedef struct {
     uint16_t    freq;
 } st_block_t;
 
-void print_damped_interval(float lower_bound, float upper_bound);
 
+
+void print_damped_interval(float lower_bound, float upper_bound);
+void reset_stb(st_block_t* stb, uint16_t stb_len);
+void g_xyzf_to_stb(g_xyzf_t* g_xyzf, st_block_t* stb, uint16_t stb_len);
 
 #endif /* LIB_STEPPER_H_ */

@@ -21,10 +21,6 @@
 extern volatile uint32_t PWM_period;
 extern volatile uint32_t PWM_duty;
 
-//extern float X, Y, Z, F;
-//extern parser_status_t parser_status;
-//extern g_code_t g_code;
-
 Void consoleFxn(UArg arg0, UArg arg1);
 
 #endif /* LIB_CONSOLE_H_ */

@@ -10,9 +10,9 @@ typedef struct {
 static maybe_float_t _mf;
 static maybe_float_t* mf = &_mf;
 
-float X, Y, Z, F;
-parser_status_t parser_status;
-g_code_t g_code;
+//float X, Y, Z, F;
+//parser_status_t parser_status;
+//g_code_cmd_t g_code;
 
 void parse_float(char* line, size_t line_length, int idx)
 {
@@ -74,7 +74,7 @@ void parse_float(char* line, size_t line_length, int idx)
     }
 }
 
-void parse_line(char* line, size_t line_length)
+void parse_line(char* line, size_t line_length, parsed_g_code_t* pgc)
 {
     char c;
     int i, idx;
@@ -87,12 +87,12 @@ void parse_line(char* line, size_t line_length)
     idx = i;
 
     if (i == line_length) {
-        parser_status = OK;
+        pgc->parser_status = OK;
         return;
     }
 
     if (i < line_length && line[i] == '(') {
-        parser_status = OK;
+        pgc->parser_status = OK;
         return;
     }
 
@@ -101,10 +101,10 @@ void parse_line(char* line, size_t line_length)
         if (c == 'G') {
             if (i == idx && i+2<line_length && line[i+1] == '9' && line[i+2] == '0') {
                 i +=2;
-                g_code = G90;
+                pgc->g_code = G90;
                 continue;
             } else {
-                parser_status = G_Error;
+                pgc->parser_status = G_Error;
                 return;
             }
         } else if (c == 'X' || c == 'Y' || c == 'Z' || c == 'F') {
@@ -114,31 +114,31 @@ void parse_line(char* line, size_t line_length)
             switch (c) {
             case 'X':
                 if (!mf->ok) {
-                    parser_status = X_Error;
+                    pgc->parser_status = X_Error;
                     return;
                 }
-                X = mf->f;
+                pgc->g_xyzf->X = mf->f;
                 break;
             case 'Y':
                 if (!mf->ok) {
-                    parser_status = Y_Error;
+                    pgc->parser_status = Y_Error;
                     return;
                 }
-                Y = mf->f;
+                pgc->g_xyzf->Y = mf->f;
                 break;
             case 'Z':
                 if (!mf->ok) {
-                    parser_status = Z_Error;
+                    pgc->parser_status = Z_Error;
                     return;
                 }
-                Z = mf->f;
+                pgc->g_xyzf->Z = mf->f;
                 break;
             case 'F':
                 if (!mf->ok) {
-                    parser_status = F_Error;
+                    pgc->parser_status = F_Error;
                     return;
                 }
-                F = mf->f;
+                pgc->g_xyzf->F = mf->f;
                 break;
             default:
                 /* never */
@@ -147,17 +147,21 @@ void parse_line(char* line, size_t line_length)
             continue;
         }
     }
-    parser_status = OK;
+    pgc->parser_status = OK;
 }
 
 
-void parse_reset(void)
+void parse_reset(parsed_g_code_t* pgc)
 {
-    parser_status = Undefined_Parser_Status;
-    g_code = Undefined_Gcode;
-    X = 0.0;
-    Y = 0.0;
-    Z = 0.0;
-    F = 0.0;
+    pgc->parser_status = Undefined_Parser_Status;
+    pgc->g_code = Undefined_Gcode;
+    if (pgc->g_xyzf) {
+        pgc->g_xyzf->X = 0.0;
+        pgc->g_xyzf->Y = 0.0;
+        pgc->g_xyzf->Z = 0.0;
+        pgc->g_xyzf->F = 0.0;
+    } else {
+        // TODO: assertion
+    }
 }
 
