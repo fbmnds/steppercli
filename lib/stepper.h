@@ -30,7 +30,7 @@ typedef enum {
 typedef struct {
     axis_t      axis;
     direction_t dir;
-    uint16_t    steps;
+    uint32_t    steps;
     uint16_t    freq;
 } st_block_t;
 

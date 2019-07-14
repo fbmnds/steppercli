@@ -18,6 +18,8 @@ static g_xyzf_t* g_xyzf = &_g_xyzf;
 static parsed_g_code_t _pgc;
 static parsed_g_code_t* pgc = &_pgc;
 
+static st_block_t stb[2*DAMP_COEFF_LEN+1];
+
 
 void print_greeting(void)
 {
@@ -97,9 +99,8 @@ void do_damp(void)
 
 void do_parse(void)
 {
-#if(0)
     int i;
-#endif
+
 
     fflush(stdin);
     /* Request G-code */
@@ -123,6 +124,12 @@ void do_parse(void)
         printf("Error code %d\n", pgc->parser_status);
     if (pgc->g_code == G90) printf("G90 ");
     printf("X %5.2f Y %5.2f Z %5.2f F %5.2f\n", pgc->g_xyzf->X, pgc->g_xyzf->Y, pgc->g_xyzf->Z, pgc->g_xyzf->F);
+    g_xyzf_to_stb(pgc->g_xyzf, stb, (2*DAMP_COEFF_LEN+1));
+    printf(" steps  |  freq\n");
+    for(i=0; i<(2*DAMP_COEFF_LEN+1); i++) {
+        printf(" %d   |   %d\n", stb[i].steps, stb[i].freq);
+        fflush(stdout);
+    }
     fflush(stdin);
 }
 

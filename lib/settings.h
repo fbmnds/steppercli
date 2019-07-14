@@ -13,7 +13,9 @@
 #define MIN_DIST         0.01
 #define MIN_DAMP_DIST    0.5
 #define F_MIN          200.0
+#define F_MIN_FREQ    ((uint16_t)(MICROSTEPS_PER_DISTANCE(F_MIN)/60))
 #define F_MAX         1500.0
+#define F_MAX_FREQ    ((uint16_t)(MICROSTEPS_PER_DISTANCE(F_MAX)/60))
 
 #define PWM_CLOCK_MHz 20
 #define PWM_WIDTH_uS  10
